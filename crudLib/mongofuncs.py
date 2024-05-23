@@ -46,7 +46,10 @@ def insertUpdate(uri, db, col, df, uui):
            countupd += 1
         else:
            ins.append(dd.index(i))
-    coll.bulk_write(updates)
+    if len(updates)>0:
+        coll.bulk_write(updates)
+    else:
+        pass
     #creating chunks of 1kb per each write
     if countupd==0:
         df_ins = df1
