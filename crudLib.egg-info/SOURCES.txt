@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+LICENSE
+>>>>>>> aa31e07 (updating UpdateFunction)
 README.md
 setup.py
 crudLib/__init__.py
