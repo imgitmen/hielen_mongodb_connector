@@ -50,7 +50,7 @@ def insertUpdate(uri, db, col, df, uui, **kwargs):
     # Merge the resulting DataFrame with the res DataFrame to get the necessary columns
     final_df = pd.merge(merged_df, res, left_on='index_timelist', right_index=True)
     # Prepare updates using vectorized operations
-    updates = final_df.apply(lambda row: UpdateOne({'_id': row['_id']},{'$set': {'ts_val.1.' + str(row['index']): df1.at[row['index_dd'], 'val']}}), axis=1).tolist()
+    updates = final_df.apply(lambda row: UpdateOne({'_id': row['_id']},{'$set': {'ts_val.1.' + str(row['index']): df1.at[row['index_dd'], 'val']}}), axis=1).values.tolist()
     countupd = len(updates)
     # Find indices in dd not present in timelist
     ins = dd_series[~dd_series.isin(timelist_series)].index.tolist()
@@ -69,7 +69,7 @@ def insertUpdate(uri, db, col, df, uui, **kwargs):
     m = 0
     for i in range(0, len(df_ins)):
             k = 800
-            r = df_ins['ts'].iloc[i]
+            r = float(df_ins['ts'].iloc[i])
             v = df_ins['val'].iloc[i]
             k -= (m/2)
             if (k <= 0 and i != len(df_ins)-1):
@@ -188,7 +188,7 @@ def deletes(uri, db, col, uui, time1, **kwargs):
        try:
           dlt = res.apply(lambda row: UpdateOne({'_id': row['_id']}, {"$unset": {\
             'ts_val.1.' + str(row['index']): 1,\
-            'ts_val.0.' + str(row['index']): 1}}),axis=1).tolist()
+            'ts_val.0.' + str(row['index']): 1}}),axis=1).values.tolist()
           coll.bulk_write(dlt)
           coll.update_many({}, {"$pull" : {'ts_val.1': None, 'ts_val.0':None}})
           coll.delete_many({ 'ts_val': { '$exists': True, '$eq': [] } })
