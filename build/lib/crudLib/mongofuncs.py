@@ -11,12 +11,18 @@ def connecting(uri, db, col, user, pw, cert):
 
 #    use this if tls/ssl connections activated
 #    client = MongoClient(uri, uuidRepresentation='standard', username = user, password = pw, tls=True, tlsCAFile=certifi.where(), tlsCertificateKeyFile=cert, tlsAllowInvalidCertificates=True)
-    client = MongoClient(uri, uuidRepresentation='standard', username = user, password = pw)
-    database = client[db]
-    collection = database[col]
-    return client, collection
-def insertUpdate(uri, db, col, df, uui, user, pw, **kwargs):
+     if (user is None) & (pw is None):
+        client = MongoClient(uri, uuidRepresentation='standard')
+     else:
+        client = MongoClient(uri, uuidRepresentation='standard', username = user, password = pw)
+     database = client[db]
+     collection = database[col]
+     return client, collection
+#def insertUpdate(uri, db, col, df, uui, user, pw, **kwargs):
+def insertUpdate(uri, db, col, df, uui, **kwargs):
     cert = kwargs.get("cert")
+    user = kwargs.get("user")
+    pw = kwargs.get("pw")
     client, coll = connecting(uri, db, col, user, pw, cert)
     df1 = pd.DataFrame(df)
     dd = df1['DATE'].sort_values().head(1).reset_index()
@@ -113,8 +119,11 @@ def insertUpdate(uri, db, col, df, uui, user, pw, **kwargs):
            session.abort_transaction()
     client.close()
     return
-def fetch(uri, db, col, uui, user, pw, **kwargs):
+#def fetch(uri, db, col, uui, user, pw, **kwargs):
+def fetch(uri, db, col, uui, **kwargs):
     cert = kwargs.get("cert")
+    user = kwargs.get("user")
+    pw = kwargs.get("pw")
     client, coll = connecting(uri, db, col, user, pw, cert)
     TIme1 = kwargs.get("time1")
     TIme2 = kwargs.get("time2")
@@ -161,8 +170,10 @@ def fetch(uri, db, col, uui, user, pw, **kwargs):
     res.rename(columns = {'value': uui, 'time':'Timestamp'},inplace = True)
     client.close()
     return res
-def deletes(uri, db, col, uui, time1, user, pw, **kwargs):
+def deletes(uri, db, col, uui, time1, **kwargs):
     cert = kwargs.get("cert")
+    user = kwargs.get("user")
+    pw = kwargs.get("pw")
     client, coll = connecting(uri, db, col, user, pw, cert)
     TIme2 = kwargs.get("time2")
     if TIme2 is not None:
